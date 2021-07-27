@@ -1,40 +1,16 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
-// find a better looking border when selecting cards to keep
-// implementing pop ups for rules and when player loses, restart entire game
-// find sound FX (drawing card, win and lose)
 
 // Player points and bet
 let playerPoints = 50;
 let playerBet = 0;
 // Game data arrays and objects to help in calcHandScore
 const hand = [];
-let cardNameTally = {};
-let cardSuitTally = {};
-// To help check for pairs and X of a kind
-let cardTallyKeyArray = [];
-// To check for flushes
-let cardSuitKeyArray = [];
-// To order card values to check for straights
-let valueArray = [];
 // GAME MODE GLOBAL VALUES
 let canRedraw = true;
 let canClick = false;
 // to help clear prev hand if not first game
 let toClearPrevHand = false;
-// GLOBAL VALUES FOR CHECKING WIN CONDITIONS
-let hasPair = false;
-let hasTwoPair = false;
-let hasThreeOfAKind = false;
-let hasFourOfAKind = false;
-let hasFlush = false;
-let hasFullHouse = false;
-let hasStraight = false;
-let hasStraightFlush = false;
-// Display pair or 3 of a kind names in winText.
-let pairOneName = '';
-let pairTwoName = '';
-let threeOfAKindName = '';
 
 /**
  * sound FX
@@ -52,10 +28,27 @@ const playAudio = (sound) => {
  */
 const calcHandScore = () => {
   pointsCounter.innerText = `Your current points: ${playerPoints}`;
-  // use Object.keys to return the name and suits of the cards in an array
-  cardTallyKeyArray = Object.keys(cardNameTally);
-  cardSuitKeyArray = Object.keys(cardSuitTally);
-  checkHandForWins();
+  // check winning conditions
+  winningConditionsCheck();
+  playerBet = 0;
+  // redraw DOM elements to update and prepare for next round
+  betDisplayText.innerText = `Your current bet is ${playerBet}`;
+  buttonDiv.appendChild(betInputReset);
+  buttonDiv.appendChild(betInputMin);
+  buttonDiv.appendChild(betInputMax);
+  buttonDiv.appendChild(dealButton);
+  toClearPrevHand = true;
+  buttonDiv.removeChild(returnButton);
+  pointsCounter.innerText = `Your current points: ${playerPoints}`;
+  // reinitialize tallies and array for next round
+  // add win or lose text
+  outputMsgDiv.classList.add('outputMsgDiv');
+  outputMsgDiv.classList.add('centerAligned');
+  outputMsgDiv.appendChild(winText);
+  // If playerPoints = 0, create a message that it is game over and for them to restart
+  if (playerPoints <= 0) {
+    loseMessage();
+  }
 };
 
 // Get a random index ranging from 0 (inclusive) to max (exclusive).
@@ -162,7 +155,7 @@ let deck = shuffleCards(makeDeck());
 
 //* * HAND SCORE LOGIC */
 
-const playerHandTally = () => {
+const playerHandTally = (cardNameTally, cardSuitTally) => {
   for (let i = 0; i < hand.length; i += 1) {
     const cardName = hand[i].name;
     const cardSuit = hand[i].suit;
@@ -187,38 +180,36 @@ const playerHandTally = () => {
 /**
  * @description Check for both 1 pair (in case of full house) or 2 pair (winning hand)
  */
-const checkForPair = () => {
+const checkForPair = (cardTallyKeyArray, cardNameTally) => {
   for (let i = 0; i < cardTallyKeyArray.length; i += 1) {
     const cardNameInTally = cardTallyKeyArray[i];
     if (cardNameTally[cardNameInTally] === 2) {
-      hasPair = true;
-      if (pairOneName !== '') {
-        pairTwoName = cardNameInTally;
-        hasTwoPair = true;
-        playerPoints += playerBet * 2;
-      }
-      else {
-        pairOneName = cardNameInTally;
-      }
+      return true;
     }
   }
-  if (hasTwoPair) {
-    winText.innerText = `You have gotten two pairs of ${pairOneName}s and ${pairTwoName}s! x2 Points!`;
+  return false;
+};
+const checkForTwoPair = (cardTallyKeyArray, cardNameTally) => {
+  let hasOnePair = false;
+  for (let i = 0; i < cardTallyKeyArray.length; i += 1) {
+    const cardNameInTally = cardTallyKeyArray[i];
+    if (cardNameTally[cardNameInTally] === 2) {
+      if (hasOnePair) {
+        return true;
+      }
+
+      hasOnePair = true;
+    }
   }
-  pairOneName = '';
-  pairTwoName = '';
+  return false;
 };
 /**
  * @description Check for 3 of a kind
  */
-const checkForThreeOfAKind = () => {
+const checkForThreeOfAKind = (cardTallyKeyArray, cardNameTally) => {
   for (let i = 0; i < cardTallyKeyArray.length; i += 1) {
     const cardNameInTally = cardTallyKeyArray[i];
     if (cardNameTally[cardNameInTally] === 3) {
-      hasThreeOfAKind = true;
-      threeOfAKindName = cardNameInTally;
-      winText.innerText = `You have gotten 3 of ${threeOfAKindName}s! x3 Points!`;
-      playerPoints += playerBet * 3;
       return true;
     }
   }
@@ -226,28 +217,12 @@ const checkForThreeOfAKind = () => {
 };
 
 /**
- * @description Check if both 3 of a kind and pair are true
- */
-const checkForFullHouse = () => {
-  if (hasPair === true && hasThreeOfAKind === true) {
-    hasFullHouse = true;
-    winText.innerText = `You have gotten a full house with a pair of ${pairOneName}s and three ${threeOfAKindName}s! x9 Points! `;
-    playerPoints += playerBet * 9;
-    return true;
-  }
-  return false;
-};
-
-/**
  * @description Check if 4 of a kind
  */
-const checkForFourOfAKind = () => {
+const checkForFourOfAKind = (cardTallyKeyArray, cardNameTally) => {
   for (let i = 0; i < cardTallyKeyArray.length; i += 1) {
     const cardNameInTally = cardTallyKeyArray[i];
     if (cardNameTally[cardNameInTally] === 4) {
-      hasFourOfAKind = true;
-      winText.innerText = `You have gotten 4 of ${cardNameInTally}s! x25 Points!`;
-      playerPoints += playerBet * 25;
       return true;
     }
   }
@@ -257,11 +232,8 @@ const checkForFourOfAKind = () => {
 /**
  * @description Check if all cards have same suit
  */
-const checkForFlush = () => {
+const checkForFlush = (cardSuitTally, cardSuitKeyArray) => {
   if (cardSuitTally[cardSuitKeyArray[0]] === 5) {
-    hasFlush = true;
-    winText.innerText = `You have gotten a flush with 5 cards of ${cardSuitKeyArray[0]}! x6 Points!`;
-    playerPoints += playerBet * 6;
     return true;
   }
   return false;
@@ -270,76 +242,91 @@ const checkForFlush = () => {
 /**
  * @description Check if all cards have a diff of 1 after sorting in ascending order
  */
-const checkForStraight = () => {
+const checkForStraight = (valueArray) => {
   for (let i = 0; i < hand.length; i += 1) {
     valueArray.push(hand[i].rank);
   }
   valueArray.sort((a, b) => a - b);
   for (let i = 0; i < valueArray.length - 1; i += 1) {
     if (Math.abs(valueArray[i] - valueArray[i + 1]) !== 1) {
-      hasStraight = false;
       return false;
     }
   }
-  hasStraight = true;
-  playerPoints += playerBet * 4;
-  winText.innerText = 'You have gotten a straight! x4 Points!';
   return true;
-};
-
-/**
- * @description Check if straight and flush are both true
- */
-const checkForStraightFlush = () => {
-  if (hasFlush === true && hasStraight === true) {
-    hasStraightFlush = true;
-    winText.innerText = 'You have gotten a straight flush! 50x Points!';
-    playerPoints += playerBet * 50;
-    return true;
-  }
-  return false;
 };
 
 /**
  * @description Check if straight and flush are both true and the lowest ranked card is a 10
  */
-const checkforRoyalFlush = () => {
-  if (hasStraightFlush === true) {
-    valueArray.sort((a, b) => a - b);
-    if (valueArray[0] === 10) {
-      winText.innerText = 'You got a royal Flush! OMG! 100x POINTS!';
-      playerPoints = playerBet * 100;
-    }
+const checkforRoyalFlush = (valueArray) => {
+  valueArray.sort((a, b) => a - b);
+  if (valueArray[0] === 10) {
+    return true;
   }
+  return false;
+};
+
+const winTextChange = (textHere) => {
+  winText.innerText = textHere;
 };
 
 const winningConditionsCheck = () => {
+  const cardNameTally = {};
+  const cardSuitTally = {};
+  playerHandTally(cardNameTally, cardSuitTally);
+  const cardTallyKeyArray = Object.keys(cardNameTally);
+  const cardSuitKeyArray = Object.keys(cardSuitTally);
+  const valueArray = [];
+  for (let i = 0; i < hand.length; i += 1) {
+    valueArray.push(hand[i].rank);
+  }
   // canClick set to false so they cant click on cards after redraw
   canClick = false;
   // default winText means loss
   winText.innerText = 'You lost :(';
-  // reset winning conditions in case not first round
-  hasPair = false;
-  hasTwoPair = false;
-  hasThreeOfAKind = false;
-  hasFourOfAKind = false;
-  hasFlush = false;
-  hasFullHouse = false;
-  hasStraight = false;
-  hasStraightFlush = false;
-  checkForPair();
-  checkForThreeOfAKind();
-  checkForFullHouse();
-  checkForFourOfAKind();
-  checkForStraight();
-  checkForFlush();
-  checkForStraightFlush();
-  checkforRoyalFlush();
-  // If royal flush
-  //    Update playerPoints
-  //    change the winText
-  //    play winning audio
-  // ...
+  if (checkForFlush(cardSuitTally, cardSuitKeyArray) && checkForStraight(valueArray)) {
+    if (checkforRoyalFlush(valueArray)) {
+      const royalFlushText = 'You got a royal Flush! OMG! 100x POINTS!';
+      winTextChange(royalFlushText);
+      playerPoints = playerBet * 100;
+    }
+    else {
+      const straightFlushText = 'You have gotten a straight flush! 50x Points!';
+      winTextChange(straightFlushText);
+      playerPoints = playerBet * 50;
+    }
+  }
+  else if (checkForFlush(cardSuitTally, cardSuitKeyArray)) {
+    const flushText = `You have gotten a flush with 5 cards of ${cardSuitKeyArray[0]}! x6 Points!`;
+    winTextChange(flushText);
+    playerPoints += playerBet * 6;
+  }
+  else if (checkForStraight(valueArray)) {
+    const straightText = 'You have gotten a straight! x4 Points!';
+    winTextChange(straightText);
+    playerPoints += playerBet * 4;
+  }
+  else if (checkForFourOfAKind(cardTallyKeyArray, cardNameTally)) {
+    const fourOfaKindText = 'You have gotten 4 of a kind! x25 Points!';
+    winTextChange(fourOfaKindText);
+    playerPoints += playerBet * 25;
+  }
+  else if (checkForThreeOfAKind(cardTallyKeyArray, cardNameTally)
+  && checkForPair(cardTallyKeyArray, cardNameTally)) {
+    const fullHouseText = 'You have gotten a full house! x9 Points!';
+    winTextChange(fullHouseText);
+    playerPoints += playerBet * 9;
+  }
+  else if (checkForThreeOfAKind(cardTallyKeyArray, cardNameTally)) {
+    const threeOfAKindText = 'You have gotten 3 of a kind! x3 Points!';
+    winTextChange(threeOfAKindText);
+    playerPoints += playerBet * 3;
+  }
+  else if (checkForTwoPair(cardTallyKeyArray, cardNameTally)) {
+    const twoPairText = 'You have gotten 2 pairs! x2 Points!';
+    winTextChange(twoPairText);
+    playerPoints += playerBet * 2;
+  }
   if (winText.innerText === 'You lost :(') {
     playAudio('loseSound.mp4');
   }
@@ -377,37 +364,6 @@ const loseMessage = () => {
     pointsCounter.innerText = `Your current points: ${playerPoints}`;
     betDisplayText.innerText = `Your current bet is ${playerBet}`;
   }));
-};
-
-/**
- * @description check winning conditions and modify the win text and allocate points if necessary.
- *
- */
-const checkHandForWins = () => {
-  // check winning conditions
-  winningConditionsCheck();
-  playerBet = 0;
-  // redraw DOM elements to update and prepare for next round
-  betDisplayText.innerText = `Your current bet is ${playerBet}`;
-  buttonDiv.appendChild(betInputReset);
-  buttonDiv.appendChild(betInputMin);
-  buttonDiv.appendChild(betInputMax);
-  buttonDiv.appendChild(dealButton);
-  toClearPrevHand = true;
-  buttonDiv.removeChild(returnButton);
-  pointsCounter.innerText = `Your current points: ${playerPoints}`;
-  // reinitialize tallies and array for next round
-  cardNameTally = {};
-  cardSuitTally = {};
-  valueArray = [];
-  // add win or lose text
-  outputMsgDiv.classList.add('outputMsgDiv');
-  outputMsgDiv.classList.add('centerAligned');
-  outputMsgDiv.appendChild(winText);
-  // If playerPoints = 0, create a message that it is game over and for them to restart
-  if (playerPoints <= 0) {
-    loseMessage();
-  }
 };
 
 /**
@@ -519,8 +475,6 @@ const redrawCards = () => {
     replaceCards[i].classList.remove('to-remove');
     replaceCards[i].classList.add('redrawn-card');
   }
-  // redo tally in hand array and recalc score
-  playerHandTally(hand);
   calcHandScore(hand);
   playAudio('drawSound.mp4');
 };
