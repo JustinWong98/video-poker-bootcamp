@@ -1,0 +1,261 @@
+@font-face {
+  font-family: pokerFont;
+  src: url(Poker.ttf);
+}
+
+@font-face {
+  font-family: gameFont;
+  src: url(Gameplay.ttf);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-image: url("casino.jpg");
+  background-size: 130%;
+  background-position: top;
+}
+
+button {
+  border-radius: 20%;
+}
+
+.centerAligned {
+  display: flex;
+  justify-content: center;
+}
+
+#cardTable {
+  display: flex;
+  justify-content: center;
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.mainDiv {
+  max-width: 100%;
+  max-height: 90%;
+  margin: 13vh auto;
+}
+
+.buttonDiv {
+  margin: 20px 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pointsDisplayDiv {
+  padding: 5px;
+  display: flex;
+  border-radius: 25px;
+  justify-content: space-around;
+  background-color: #75b1a9;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.outputMsgDiv {
+  padding: 5px;
+  display: flex;
+  border-radius: 25px;
+  justify-content: space-around;
+  background-color: #75b1a9;
+  max-width: 100%;
+  max-height: 100%;
+  margin-top: 2vh;
+}
+
+.betDisplay {
+  padding: 5px;
+  border-radius: 25px;
+  max-width: 100%;
+  max-height: 100%;
+  background-color: goldenrod;
+}
+
+.card {
+  border: 3px groove gold;
+  border-radius: 15px;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 96.5%;
+  position: relative;
+  display: inline-block;
+}
+
+.redrawn-card {
+  border: 3px solid transparent;
+}
+
+.cardImage {
+  max-width: 20vw;
+  max-height: 30vh;
+  animation: fadeInDown;
+  animation-duration: 1s;
+}
+
+.to-remove {
+  border: 3px solid transparent;
+}
+
+.enter-bottom {
+  animation: fadeInUp;
+  animation-duration: 1s;
+}
+
+.red {
+  color: red;
+}
+
+.black {
+  color: black;
+}
+
+.gameText {
+  font-family: gameFont;
+}
+
+.pokerText {
+  font-family: pokerFont;
+  color: #d9b44a;
+}
+
+button {
+  font-size: 150%;
+}
+
+li {
+  font-family: gameFont;
+  margin: 10px 0px;
+  color: gold;
+}
+
+h3 {
+  font-size: 200%;
+}
+
+.scoreInfoDiv {
+  max-width: 20%;
+  display: flex;
+  align-self: center;
+  position: absolute;
+  margin-top: 10vh;
+}
+
+.instructionText {
+  padding: 15px 0px;
+  margin: 10px 0px;
+  color: yellowgreen;
+}
+
+.button:hover {
+  background: #06d85f;
+}
+
+.infoButton {
+  padding: 10px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease-out;
+  background: grey;
+}
+
+.infoButton:hover {
+  background: #06d85f;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 0.5s;
+  visibility: hidden;
+  opacity: 0;
+}
+.overlay:target {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup {
+  margin: 70px auto;
+  padding: 20px;
+  background: black;
+  border-radius: 5px;
+  width: 30%;
+  position: relative;
+  transition: all 0.5s ease-in-out;
+}
+
+.popup .close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  transition: all 200ms;
+  font-size: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+
+.popup .close:hover {
+  color: #06d85f;
+}
+
+.popup .content {
+  max-height: 30%;
+  overflow: auto;
+}
+
+.popup .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+@media screen and (max-width: 767px) {
+  .thirdDiv {
+    margin-top: 2vh;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+  }
+  .to-remove {
+    border: 3px solid transparent;
+  }
+  .box {
+    width: 70%;
+  }
+  .popup {
+    width: 70%;
+  }
+  body {
+    background-position: top;
+    background-size: 390%;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  h1 {
+    font-size: 250%;
+  }
+  body {
+    background-position: top;
+    background-size: 110%;
+  }
+}
+
+@media screen and (max-height: 670px) {
+  p {
+    font-size: 90%;
+  }
+  button {
+    font-size: 140%;
+  }
+}

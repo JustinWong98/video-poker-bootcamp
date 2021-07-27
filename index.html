@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokermon</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+  </head>
+
+  <body>
+    <h1 class="centerAligned pokerText">Video Poker</h1>
+    <!-- Import program logic -->
+    <script src="script.js"></script>
+    <div class="scoreInfoDiv centerAligned">
+      <a class="infoButton gameText" href="#popupDiv">How to Play</a>
+    </div>
+    <div id="popupDiv" class="overlay">
+      <div class="popup">
+        <a class="close" href="#">&times;</a>
+        <div class="instructionBox">
+          <p class="centerAligned gameText instructionText">
+            Enter your bet using the buttons, and then choose which cards to
+            keep. <br />They will have a border around them.<br /><br />
+            Then, press to redraw/keep. See winning hands below with their
+            multipliers.
+          </p>
+          <h3 class="pokerText centerAligned">Combinations</h3>
+          <ul>
+            <li>Royal Flush: 100x</li>
+            <li>Straight Flush: 50x</li>
+            <li>Four of a Kind: 25x</li>
+            <li>Full House: 9x</li>
+            <li>Flush: 6x</li>
+            <li>Straight: 4x</li>
+            <li>Three of A Kind: 3x</li>
+            <li>Two Pair: 2x</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
